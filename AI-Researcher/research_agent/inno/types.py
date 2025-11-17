@@ -4,18 +4,21 @@ from typing import List, Callable, Union, Optional, Tuple
 # Third-party imports
 from pydantic import BaseModel
 
+from research_agent.constant import COMPLETION_MODEL
+
 AgentFunction = Callable[[], Union[str, "Agent", dict]]
 
 
 class Agent(BaseModel):
     name: str = "Agent"
-    model: str = "gpt-4o"
+    model: str = COMPLETION_MODEL
     instructions: Union[str, Callable[[], str]] = "You are a helpful agent."
     functions: List[AgentFunction] = []
     tool_choice: str = None
     parallel_tool_calls: bool = False
     examples: Union[List[Tuple[dict, str]], Callable[[], str]] = []
     handle_mm_func: Callable[[], str] = None
+    reasoning_effort: Optional[str] = "high"
 
 
 class Response(BaseModel):

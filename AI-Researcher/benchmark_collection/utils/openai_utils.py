@@ -1,15 +1,19 @@
 # openai_utils.py
-import openai
-import backoff
-import time
-import os
-import tiktoken
 import asyncio
-from typing import Optional
 import datetime
-import global_state
+import os
+import time
+from typing import Optional
 
-def count_tokens(text: str, model: str = "gpt-4") -> int:
+import backoff
+import global_state
+import openai
+import tiktoken
+
+from research_agent.constant import COMPLETION_MODEL
+
+
+def count_tokens(text: str, model: str = COMPLETION_MODEL) -> int:
     try:
         encoding = tiktoken.encoding_for_model(model)
     except KeyError:
@@ -19,7 +23,7 @@ def count_tokens(text: str, model: str = "gpt-4") -> int:
     return len(encoding.encode(text))
 
 class GPTClient:
-    def __init__(self, api_key: str = None, model: str = 'gpt-4o-mini-2024-07-18'):# 'gpt-4o-mini-2024-07-18'):# 'o1-mini-2024-09-12'):
+    def __init__(self, api_key: str = None, model: str = COMPLETION_MODEL):
         if api_key is None:
             api_key = os.getenv('OPENAI_API_KEY')
             api_url = os.getenv('API_BASE_URL')
@@ -72,7 +76,7 @@ class GPTClient:
     #         "content": prompt
     #     })
 
-    #     model_name = 'gpt-4'# if self.model.startswith('gpt-4') else self.model
+    #     model_name = COMPLETION_MODEL
     #     total_tokens = sum(count_tokens(msg["content"], model_name) for msg in messages)
     #     # print(f"Total input tokens: {total_tokens}")
 
@@ -134,7 +138,7 @@ class GPTClient:
         log_message("Receive Task", datetime.datetime.now(), f"Receiveing the task:\n{prompt}")
 
         # Token check (optional)
-        model_name = 'gpt-4'
+        model_name = COMPLETION_MODEL
         total_tokens = sum(count_tokens(msg["content"], model_name) for msg in messages)
 
         if total_tokens > 128000:

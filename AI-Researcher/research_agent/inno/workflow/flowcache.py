@@ -1,11 +1,14 @@
 import json
 import os
-from research_agent.inno.util import single_select_menu
-from research_agent.inno.core import MetaChain, MetaChainLogger
-from typing import Union, Dict, List, Callable, Any
-from research_agent.inno import Agent
 from abc import ABC, abstractmethod
+from typing import Union, Dict, List, Callable, Any
+
 from torch import nn
+
+from research_agent.constant import COMPLETION_MODEL
+from research_agent.inno import Agent
+from research_agent.inno.core import MetaChain, MetaChainLogger
+from research_agent.inno.util import single_select_menu
 
 class AgentModule:
     def __init__(self, agent: Agent, client: MetaChain, cache_path: str):
@@ -106,7 +109,7 @@ class ToolModule:
         return None
 
 class FlowModule(ABC):
-    def __init__(self, cache_path: str, log_path: Union[str, None, MetaChainLogger] = None, model: str = "gpt-4o-2024-08-06"):
+    def __init__(self, cache_path: str, log_path: Union[str, None, MetaChainLogger] = None, model: str = COMPLETION_MODEL):
         self.cache_path = cache_path
         self.client = MetaChain(log_path=log_path)
         self.model = model

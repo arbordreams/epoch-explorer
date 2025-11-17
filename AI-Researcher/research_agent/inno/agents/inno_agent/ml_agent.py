@@ -25,7 +25,7 @@ def case_not_resolved(failure_reason):
    return failure_reason
    
 @register_agent("get_ml_agent")
-def get_ml_agent(model: str, **kwargs):
+def get_ml_agent(model: str, reasoning_effort: str = "high", **kwargs):
     code_env: DockerEnv = kwargs.get("code_env", None)
     def instructions(context_variables):
       working_dir = context_variables.get("working_dir", None)
@@ -97,6 +97,7 @@ Remember: Your goal is to create a well-organized, self-contained project that:
     instructions=instructions,
     functions=tools,
     tool_choice = "required", 
-    parallel_tool_calls = False
+    parallel_tool_calls = False,
+    reasoning_effort=reasoning_effort,
     )
 

@@ -1,11 +1,14 @@
-from typing import List, Optional, Tuple, Dict
-import PyPDF2
-import re
-import tiktoken
-from dataclasses import dataclass
-from collections import defaultdict
-from docling.document_converter import DocumentConverter
 import os
+import re
+from collections import defaultdict
+from dataclasses import dataclass
+from typing import List, Optional, Tuple, Dict
+
+import PyPDF2  # type: ignore
+import tiktoken
+from docling.document_converter import DocumentConverter
+
+from research_agent.constant import COMPLETION_MODEL
 
 @dataclass
 class PDFElement:
@@ -341,7 +344,7 @@ def read_pdf(pdf_path: str, use_docling: bool = True) -> str:
     parser = PDFParser()
     return parser.read_pdf(pdf_path, use_docling)
 
-def truncate_text(text: str, max_tokens: int = 128000, model: str = "gpt-4") -> str:
+def truncate_text(text: str, max_tokens: int = 128000, model: str = COMPLETION_MODEL) -> str:
     """Truncate text to fit within token limit."""
     try:
         encoding = tiktoken.encoding_for_model(model)

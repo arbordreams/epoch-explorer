@@ -1,18 +1,33 @@
-from research_agent.inno.registry import register_tool
-from browsergym.core.action.highlevel import HighLevelActionSet
-from typing import Literal
-from research_agent.inno.environment.browser_env import BrowserEnv, VIEWPORT
-from research_agent.inno.environment.docker_env import DockerEnv, DockerConfig
-from browsergym.utils.obs import flatten_axtree_to_str
 from dataclasses import dataclass, field
-from typing import Dict
-from urllib.parse import quote_plus
-from research_agent.inno.types import Result
+from datetime import datetime
 from functools import partial, update_wrapper
 from inspect import signature
+from typing import Dict, Literal
+from urllib.parse import quote_plus
+
 import tiktoken
-from datetime import datetime
+from browsergym.core.action.highlevel import HighLevelActionSet
+from browsergym.utils.obs import flatten_axtree_to_str
+
+from research_agent.constant import COMPLETION_MODEL
+from research_agent.inno.environment.browser_env import BrowserEnv, VIEWPORT
+from research_agent.inno.environment.docker_env import DockerEnv, DockerConfig
+from research_agent.inno.registry import register_tool
+from research_agent.inno.types import Result
 from research_agent.inno.util import function_to_json
+_ENCODING_CACHE = {}
+
+
+def _get_encoding(model: str):
+    if model in _ENCODING_CACHE:
+        return _ENCODING_CACHE[model]
+    try:
+        encoding = tiktoken.encoding_for_model(model)
+    except KeyError:
+        print(f"Warning: model {model} not found. Using cl100k_base encoding.")
+        encoding = tiktoken.get_encoding("cl100k_base")
+    _ENCODING_CACHE[model] = encoding
+    return encoding
 # def with_env(env: BrowserEnv):
 #     """将env注入到工具函数中的装饰器"""
 #     def decorator(func):
@@ -326,9 +341,9 @@ def sleep(env: BrowserEnv):
             value=ret_value,
             image=web_obs.screenshot, 
         )
-def truncate_by_tokens(env: DockerEnv, text, max_tokens = 4096, model="gpt-4o"):
-    from inno.tools.files import create_file, create_directory
-    encoding = tiktoken.encoding_for_model(model)
+def truncate_by_tokens(env: DockerEnv, text, max_tokens=4096, model: str = COMPLETION_MODEL):
+    from research_agent.inno.tools.files import create_file, create_directory  # type: ignore
+    encoding = _get_encoding(model)
     tokens = encoding.encode(text)
     
     if len(tokens) <= max_tokens:

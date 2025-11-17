@@ -17,9 +17,9 @@ from inspect import signature
 from research_agent.inno.types import Result
 from research_agent.inno.tools.terminal_tools import gen_code_tree_structure, read_file, terminal_page_down, terminal_page_up, terminal_page_to
 from typing import List
-from research_agent.constant import CHEEP_MODEL
+from research_agent.constant import CHEEP_MODEL, COMPLETION_MODEL
 
-def get_paper_survey_agent(model: str, **kwargs):
+def get_paper_survey_agent(model: str, reasoning_effort: str = "high", **kwargs):
     file_env: RequestsMarkdownBrowser = kwargs.get("file_env", None)
     assert file_env is not None, "file_env is required"
     def instructions(context_variables):
@@ -77,10 +77,11 @@ Remember: Your analysis forms the theoretical foundation for the subsequent code
         functions=tool_list,
         tool_choice="required",
         parallel_tool_calls=False,
+        reasoning_effort=reasoning_effort,
     )
 
 
-def get_code_survey_agent(model: str, **kwargs):
+def get_code_survey_agent(model: str, reasoning_effort: str = "high", **kwargs):
     code_env: DockerEnv = kwargs.get("code_env", None)
     assert code_env is not None, "code_env is required"
     def instructions(context_variables):
@@ -139,6 +140,7 @@ Remember: Your analysis bridges the gap between theoretical concepts and practic
         functions=tool_list,
         tool_choice="required",
         parallel_tool_calls=False,
+        reasoning_effort=reasoning_effort,
     )
 
 
@@ -157,7 +159,7 @@ The notes are as follows:
         context_variables=context_variables,
     )
 
-def get_survey_agent(model: str = CHEEP_MODEL, **kwargs):
+def get_survey_agent(model: str = COMPLETION_MODEL, reasoning_effort: str = "high", **kwargs):
     file_env: RequestsMarkdownBrowser = kwargs.get("file_env", None)
     assert file_env is not None, "file_env is required"
     code_env: DockerEnv = kwargs.get("code_env", None)
@@ -203,14 +205,15 @@ IMPORTANT NOTES:
 
 Your goal is to create a complete knowledge base that bridges theoretical concepts with practical implementations for the proposed innovation.
 """
-    paper_survey_agent = get_paper_survey_agent(model, file_env=file_env)
-    code_survey_agent = get_code_survey_agent(model, code_env=code_env)
+    paper_survey_agent = get_paper_survey_agent(model=CHEEP_MODEL, file_env=file_env, reasoning_effort="low")
+    code_survey_agent = get_code_survey_agent(model=CHEEP_MODEL, code_env=code_env, reasoning_effort="low")
     survey_agent = Agent(
         name="Survey Agent",
         model=model,
         instructions=instructions,
         tool_choice="required",
         parallel_tool_calls=False,
+        reasoning_effort=reasoning_effort,
     )
 
     def transfer_back_to_survey_agent(academic_definition: str, code_implementation: str, reference_codebases: List[str], context_variables: dict):

@@ -8,7 +8,13 @@ from datetime import datetime
 import litellm
 from litellm import ContextWindowExceededError, BadRequestError
 from litellm.types.utils import Message as litellmMessage
-from .util import function_to_json, debug_print, merge_chunk, pretty_print_messages
+from .util import (
+    function_to_json,
+    debug_print,
+    merge_chunk,
+    pretty_print_messages,
+    apply_reasoning_effort,
+)
 from .types import (
     Agent,
     AgentFunction,
@@ -145,6 +151,8 @@ class MetaChain:
             "stream": stream,
             "base_url": API_BASE_URL,
         }
+
+        apply_reasoning_effort(create_params, agent.reasoning_effort)
 
         # GPT-5.1 responses API: drop unsupported parameters
         if str(create_params["model"]).startswith("gpt-5.1"):
@@ -387,6 +395,7 @@ class MetaChain:
                 "stream": stream,
                 "base_url": API_BASE_URL,
             }
+            apply_reasoning_effort(create_params, agent.reasoning_effort)
             NO_SENDER_MODE = False
             for not_sender_model in NOT_SUPPORT_SENDER:
                 if not_sender_model in create_model:
@@ -436,6 +445,7 @@ class MetaChain:
                 "stream": stream,
                 "base_url": API_BASE_URL,
             }
+            apply_reasoning_effort(create_params, agent.reasoning_effort)
             completion_response = await acompletion(**create_params)
             last_message = [{"role": "assistant", "content": completion_response.choices[0].message.content}]
             converted_message = convert_non_fncall_messages_to_fncall_messages(last_message, tools)

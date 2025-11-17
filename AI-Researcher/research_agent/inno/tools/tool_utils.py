@@ -1,11 +1,28 @@
-from research_agent.inno.environment.docker_env import DockerEnv
-
-import tiktoken
 from datetime import datetime
 
-def truncate_by_tokens(env: DockerEnv, text, max_tokens = 4096, model="gpt-4o"):
+import tiktoken
+
+from research_agent.constant import COMPLETION_MODEL
+from research_agent.inno.environment.docker_env import DockerEnv
+
+_ENCODING_CACHE = {}
+
+
+def _get_encoding(model: str):
+    if model in _ENCODING_CACHE:
+        return _ENCODING_CACHE[model]
+    try:
+        encoding = tiktoken.encoding_for_model(model)
+    except KeyError:
+        print(f"Warning: model {model} not found. Using cl100k_base encoding.")
+        encoding = tiktoken.get_encoding("cl100k_base")
+    _ENCODING_CACHE[model] = encoding
+    return encoding
+
+
+def truncate_by_tokens(env: DockerEnv, text, max_tokens=4096, model: str = COMPLETION_MODEL):
     from research_agent.inno.tools.terminal_tools import create_file
-    encoding = tiktoken.encoding_for_model(model)
+    encoding = _get_encoding(model)
     tokens = encoding.encode(text)
     
     if len(tokens) <= max_tokens:

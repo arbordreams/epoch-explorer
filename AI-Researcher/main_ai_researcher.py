@@ -4,6 +4,7 @@ import os
 import asyncio
 import global_state
 from dotenv import load_dotenv
+from research_agent.constant import COMPLETION_MODEL
 
 
 
@@ -16,7 +17,7 @@ def get_args_research():
     parser.add_argument("--instance_path", type=str, default="benchmark/gnn.json")
     parser.add_argument('--container_name', type=str, default='paper_eval')
     parser.add_argument("--task_level", type=str, default="task1")
-    parser.add_argument("--model", type=str, default="gpt-4o-2024-08-06")
+    parser.add_argument("--model", type=str, default=COMPLETION_MODEL)
     parser.add_argument("--workplace_name", type=str, default="workplace")
     parser.add_argument("--cache_path", type=str, default="cache")
     parser.add_argument("--port", type=int, default=12345)

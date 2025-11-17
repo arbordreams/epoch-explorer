@@ -44,7 +44,7 @@ The suggestion about the implementation:
 
 
 
-def get_code_review_agent(model: str, **kwargs):
+def get_code_review_agent(model: str, reasoning_effort: str = "high", **kwargs):
     code_env: DockerEnv = kwargs.get("code_env", None)
 
     def instructions(context_variables):
@@ -72,11 +72,12 @@ def get_code_review_agent(model: str, **kwargs):
         instructions=instructions,
         functions=tools,
         tool_choice="required",
+        reasoning_effort=reasoning_effort,
     )
 
 
 @register_agent("get_judge_agent")
-def get_judge_agent(model: str, **kwargs):
+def get_judge_agent(model: str, reasoning_effort: str = "high", **kwargs):
     file_env: RequestsMarkdownBrowser = kwargs.get("file_env", None)
     web_env: BrowserEnv = kwargs.get("web_env", None)
     code_env: DockerEnv = kwargs.get("code_env", None)
@@ -84,7 +85,7 @@ def get_judge_agent(model: str, **kwargs):
     #     model, web_env=web_env, code_env=code_env
     # )
     # filesurfer_agent = get_filesurfer_agent(model, file_env=file_env)
-    code_review_agent = get_code_review_agent(model, code_env=code_env)
+    code_review_agent = get_code_review_agent(model, reasoning_effort=reasoning_effort, code_env=code_env)
 
     def instructions(context_variables):
         working_dir = context_variables.get("working_dir", None)
@@ -117,6 +118,7 @@ def get_judge_agent(model: str, **kwargs):
             transfer_to_code_review_agent,
         ],
         tool_choice="required",
+        reasoning_effort=reasoning_effort,
     )
 
     def transfer_to_judge_agent(task_report):

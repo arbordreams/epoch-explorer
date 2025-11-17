@@ -1655,7 +1655,7 @@ def main():
         app.queue()
         allowed_paths = [os.path.dirname(LOG_FILE)]
         app.launch(
-            share=False, 
+            share=True, 
             server_port=7039,
             server_name="127.0.0.1",
             allowed_paths=allowed_paths,

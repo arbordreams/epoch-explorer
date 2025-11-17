@@ -13,6 +13,7 @@ import uuid
 import os
 from litellm import completion
 from research_agent.constant import COMPLETION_MODEL, API_BASE_URL
+from research_agent.inno.util import apply_reasoning_effort
 def with_env(env: RequestsMarkdownBrowser):
     """将env注入到工具函数中的装饰器"""
     def decorator(func):
@@ -183,7 +184,15 @@ def visualizer(env: RequestsMarkdownBrowser, image_path: str, question: Optional
             {"type": "text", "text": question},
             {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}}
         ]}]
-        res = completion(model=COMPLETION_MODEL, messages=msg)
+        create_params = {
+            "model": COMPLETION_MODEL,
+            "messages": msg,
+        }
+        apply_reasoning_effort(create_params, "high")
+        if str(create_params["model"]).startswith("gpt-5.1"):
+            create_params["drop_params"] = True
+            create_params["additional_drop_params"] = ["temperature", "top_p", "logprobs"]
+        res = completion(**create_params)
         ret_str = res.choices[0].message.content
         return Result(
             value=ret_str,
@@ -224,7 +233,16 @@ Please answer my question based on the content.
         msg = [{"role": "user", "content": [
             {"type": "text", "text": wrap_ques}
         ]}]
-        res = completion(model=COMPLETION_MODEL, messages=msg, base_url=API_BASE_URL)
+        create_params = {
+            "model": COMPLETION_MODEL,
+            "messages": msg,
+            "base_url": API_BASE_URL,
+        }
+        apply_reasoning_effort(create_params, "high")
+        if str(create_params["model"]).startswith("gpt-5.1"):
+            create_params["drop_params"] = True
+            create_params["additional_drop_params"] = ["temperature", "top_p", "logprobs"]
+        res = completion(**create_params)
         answer = res.choices[0].message.content
         return answer
     except FileNotFoundError as e:

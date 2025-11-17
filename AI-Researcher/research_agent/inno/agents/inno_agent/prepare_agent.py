@@ -29,7 +29,7 @@ I have determined the reference codebases and paths according to the existing re
         context_variables={"prepare_result": prepare_result}
     )
 @register_agent("get_prepare_agent")
-def get_prepare_agent(model: str, **kwargs):
+def get_prepare_agent(model: str, reasoning_effort: str = "high", **kwargs):
     code_env: DockerEnv = kwargs.get("code_env", None)
     def instructions(context_variables):
       working_dir = context_variables.get("working_dir", None)
@@ -66,5 +66,6 @@ During the decision process, you can use the following tools:
     instructions=instructions,
     functions=tools, 
     tool_choice = "required", 
-    parallel_tool_calls = False
+    parallel_tool_calls = False,
+    reasoning_effort=reasoning_effort,
     )

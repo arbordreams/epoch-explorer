@@ -36,9 +36,9 @@ LOG_PATH = global_state.LOG_PATH
 EVAL_MODE = str_to_bool(os.getenv('EVAL_MODE', False))
 BASE_IMAGES = os.getenv('BASE_IMAGES', "tjbtech1/paperapp:latest")
 
-COMPLETION_MODEL = os.getenv('COMPLETION_MODEL', "gpt-5.1-high")  # gpt-5.1-high
+COMPLETION_MODEL = os.getenv('COMPLETION_MODEL', "gpt-5.1")
 EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', "text-embedding-3-large")
-CHEEP_MODEL = os.getenv('CHEEP_MODEL', "gpt-5.1-high")
+CHEEP_MODEL = os.getenv('CHEEP_MODEL', "gpt-5.1")
 # BASE_URL = os.getenv('BASE_URL', None)
 
 # GPUS = os.getenv('GPUS', "all")

@@ -2,6 +2,7 @@ import os
 from typing import List, Dict
 from research_agent.inno.memory.rag_memory import Memory, Reranker
 from litellm import completion
+from research_agent.inno.util import apply_reasoning_effort
 import re
 
 class CodeMemory(Memory):
@@ -168,6 +169,7 @@ class CodeReranker(Reranker):
             "messages": chat_history,
             "stream": False,
         }
+        apply_reasoning_effort(create_params, "low")
         # GPT-5.1 responses API: drop unsupported parameters
         if str(create_params["model"]).startswith("gpt-5.1"):
             create_params["drop_params"] = True

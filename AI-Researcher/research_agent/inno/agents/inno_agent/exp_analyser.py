@@ -42,7 +42,7 @@ The further plan is: {further_plan}
         context_variables=context_variables,
     )
 
-def get_exp_analyser_agent(model: str = CHEEP_MODEL, **kwargs):
+def get_exp_analyser_agent(model: str = CHEEP_MODEL, reasoning_effort: str = "high", **kwargs):
     file_env: RequestsMarkdownBrowser = kwargs.get("file_env", None)
     assert file_env is not None, "file_env is required"
     code_env: DockerEnv = kwargs.get("code_env", None)
@@ -104,4 +104,5 @@ AVAILABLE TOOLS:
         functions=tools,
         tool_choice="required",
         parallel_tool_calls=False,
+        reasoning_effort=reasoning_effort,
     )

@@ -6,8 +6,10 @@ import random
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from benchmark_collection.utils.openai_utils import GPTClient
+from research_agent.constant import COMPLETION_MODEL
 
 
 def setup_logging(research_field):
@@ -24,7 +26,7 @@ def setup_logging(research_field):
     )
 
 class SectionComposer(ABC):
-    def __init__(self, research_field: str, section_name: str, structure_iterations: int = 3, gpt_model='gpt-4o-mini-2024-07-18'):
+    def __init__(self, research_field: str, section_name: str, structure_iterations: int = 3, gpt_model: str = COMPLETION_MODEL):
         self.gpt_client = GPTClient(model=gpt_model)
         self.structure_iterations = structure_iterations
         self.research_field = research_field

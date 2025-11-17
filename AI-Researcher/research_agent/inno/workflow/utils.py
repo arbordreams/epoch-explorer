@@ -3,6 +3,7 @@ import json
 from research_agent.inno.workflow import Graph
 from litellm import completion
 from research_agent.constant import COMPLETION_MODEL
+from research_agent.inno.util import apply_reasoning_effort
 
 def transfer_fschema_to_dict(fschema: Dict) -> Dict:
     """
@@ -89,6 +90,7 @@ You should complete the workflow graph in the following way:
         "messages": messages,
         "response_format": response_format,
     }
+    apply_reasoning_effort(create_params, "high")
     # GPT-5.1 responses API: drop unsupported parameters
     if str(create_params["model"]).startswith("gpt-5.1"):
         create_params["drop_params"] = True

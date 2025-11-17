@@ -15,6 +15,8 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.formatted_text import HTML
 from prompt_toolkit.styles import Style
+
+from research_agent.constant import COMPLETION_MODEL, CHEEP_MODEL
 def debug_print_swarm(debug: bool, *args: str) -> None:
     if not debug:
         return
@@ -113,6 +115,29 @@ def merge_chunk(final_response: dict, delta: dict) -> None:
     if tool_calls and len(tool_calls) > 0:
         index = tool_calls[0].pop("index")
         merge_fields(final_response["tool_calls"][index], tool_calls[0])
+
+
+def apply_reasoning_effort(create_params: dict, desired_level: Optional[str] = None) -> None:
+    """
+    Apply OpenAI GPT-5 reasoning effort hints to LiteLLM create params.
+
+    Args:
+        create_params: Dict passed to litellm.completion()/acompletion().
+        desired_level: Explicit reasoning level ("high"/"low"). When None, the
+            level is inferred by comparing against COMPLETION_MODEL and CHEEP_MODEL.
+    """
+    model = str(create_params.get("model", "") or "")
+    if not model.startswith("gpt-5"):
+        return
+
+    level = desired_level
+    if level is None:
+        if model == COMPLETION_MODEL and COMPLETION_MODEL != CHEEP_MODEL:
+            level = "high"
+        elif model == CHEEP_MODEL and CHEEP_MODEL != COMPLETION_MODEL:
+            level = "low"
+    if level:
+        create_params["reasoning_effort"] = level
 def get_type_info(annotation, base_type_map):
     # 处理基本类型
     if annotation in base_type_map:
