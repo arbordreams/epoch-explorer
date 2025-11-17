@@ -1,0 +1,5 @@
+{
+  "instance_id": "meta_tokenization_low_resource",
+  "task": "Meta-learning tokenization for rapid low-resource language adaptation",
+  "date_limit": "2024-01-01"
+}
